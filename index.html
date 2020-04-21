@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Javascript Calculator</title>
+        <meta charset="windows-1252">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <style>
+            
+            *{box-sizing: border-box}
+            .container{width: 400px; 
+                       overflow: hidden; 
+                       margin: 50px auto
+                     }
+            
+            .container .show-calc{border: 2px solid #95A5A6; 
+                                  height:50px;
+                                  width:100%;
+                                  font-size:25px;
+                                  line-height: 50px;
+                                  border-radius: 5px;
+                                  padding: 0 10px;
+                                }
+            .container .box{width: 25%; 
+                            height: 50px;
+                            float: left;
+                            border: 1px solid #FFF; 
+                            font-size:25px;
+                            line-height: 50px; 
+                            text-align: center;
+                            font-family: sans-serif;
+                            transition: all .25s ease-in-out;
+                            background-color: #26C281;
+                            color: #fff; 
+                            cursor: pointer;
+                          }
+            .container .box:hover{background: #1E8BC3}
+            
+            .container .box-opr{background: #F89406}
+            
+            .container .box-reset,.container .box-clear{width: 50%}
+            
+            .container .box-reset{background: #446CB3}
+            .container .box-clear{background: #F22613} 
+            
+        </style>
+        
+    </head>
+    <body>
+        
+        <div class="container">
+            <!-- show numbers and calculation -->
+            <div class="show-calc" id="sc">0</div>
+            
+            <!-- numbers div -->
+            <div class="box box-num">0</div>
+            <div class="box box-num">1</div>
+            <div class="box box-num">2</div>
+            <div class="box box-num">3</div>
+            <div class="box box-num">4</div>
+            <div class="box box-num">5</div>
+            <div class="box box-num">6</div>
+            <div class="box box-num">7</div>
+            <div class="box box-num">8</div>
+            <div class="box box-num">9</div>
+            <div class="box box-num">.</div>
+            
+            <!-- operator div -->
+            <div class="box box-opr">+</div>
+            <div class="box box-opr">-</div>
+            <div class="box box-opr">X</div>
+            <div class="box box-opr">/</div>
+            <div class="box box-opr">=</div>
+            
+            <!-- reset and clear -->
+            <div class="box box-reset" id="reset">reset</div>
+            <div class="box box-clear" id="clear">clear</div>
+            
+        </div>
+        
+        <script>
+            
+            // create our variable
+            var num1 = 0, num2 = 0, opr = "",
+                divNumbers = document.querySelectorAll(".container .box-num"),
+                divOpers = document.querySelectorAll(".container .box-opr"),
+                showCalcBox = document.getElementById("sc"),
+                resetBox = document.getElementById("reset"),
+                clearBox = document.getElementById("clear"),
+                // isOprClick = check if an operator is clicked
+                // isEqClick = check if equal is clicked
+                // fco = first click on operator
+                isOprClick = false, isEqClick = false, fco = 0;
+        
+        // add action to all divs
+        // clear show-calc box letter by letter
+        
+        clearBox.onclick = function(){
+            showCalcBox.innerHTML = showCalcBox.innerHTML.substring(0,showCalcBox.innerHTML.length - 1);
+        };
+        
+        // reset div to clear and start again
+        resetBox.onclick = function(){
+            isOprClick = false;
+            isEqClick = false;
+            fco = 0;
+            num1 = 0;
+            num2 = 0;
+            opr = "";
+            
+            sc.innerHTML = "0";
+        };
+            
+            // add action to show numbers
+            for(var i = 0; i < divNumbers.length; i++)
+            {
+                divNumbers[i].onclick = function(){
+                  
+                  if(isOprClick)
+                  {
+                      num1 = parseFloat(sc.innerHTML);
+                      sc.innerHTML = "";
+                  }
+                  // check if the text dont contain '.'
+                  if(sc.innerHTML.toString().indexOf(".") === -1)
+                  {
+                      // if text is equal to 0 and the div pressed is not a '.'
+                      if(sc.innerHTML === "0" && this.innerHTML !== "."){
+                        sc.innerHTML = this.innerHTML;    
+                        isOprClick = false;
+                      }else{
+                          sc.innerHTML = sc.innerHTML + this.innerHTML;
+                          isOprClick = false;
+                      }
+                      
+                  }else if(this.innerHTML !== ".")
+                    {
+                      sc.innerHTML = sc.innerHTML + this.innerHTML;
+                      isOprClick = false;
+                    }
+                  
+                 
+                };
+            }
+            
+            // add action to do operations
+            for(var i = 0; i < divOpers.length; i++)
+            {
+                divOpers[i].onclick = function(){
+                  
+                    if(fco === 0)
+                    {
+                        fco++;
+                        num1 = parseFloat(sc.innerHTML);
+                        // get the operator
+                        opr = this.innerHTML;
+                        isOprClick = true;
+                    }
+                    else{
+                        if(this.innerHTML !== "="){// if the clicked div is not '='
+                            if(!isEqClick){// if '=' is not already clicked
+                                
+                                num2 = parseFloat(sc.innerHTML);
+                                sc.innerHTML = calc(opr, num1, num2);
+                                opr  = this.innerHTML;
+                                num2 = parseFloat(sc.innerHTML);
+                                isOprClick = true;
+                                isEqClick = false;
+                            }else{
+                                isEqClick = false;
+                                opr = this.innerHTML;
+                            }
+                        }else{
+                                num2 = parseFloat(sc.innerHTML);
+                                sc.innerHTML = calc(opr, num1, num2);
+                                opr  = this.innerHTML;
+                                num1 = parseFloat(sc.innerHTML);
+                                isOprClick = true;
+                                isEqClick = true;
+                        }
+                    }
+        
+                };
+            }
+            
+            // create a calc function to do the operations
+            function calc(op,n1,n2)
+            {
+                var result = 0;
+                
+                switch(op){
+                    case"+":
+                        result = n1 + n2;
+                        break;
+                   case"-":
+                        result = n1 - n2;
+                        break;  
+                    case"X":
+                        result = n1 * n2;
+                        break;
+                    case"/":
+                        if(n2 > 0)
+                        result = n1 / n2;
+                    
+                        break;
+                }
+                return result;
+            }
+            
+            
+        </script>
+        
+    </body>
+</html>
